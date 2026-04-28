@@ -1,0 +1,40 @@
+pipeline {
+    agent any
+    stages {
+
+        stage("Unit test") {
+            steps {
+                sh "pip install -r requirements.txt --break-system-packages -q"
+                sh "python -m unittest test_blackjack -v"
+            }
+        }
+
+        stage("Code coverage") {
+            steps {
+                sh "coverage run -m unittest test_blackjack"
+                sh "coverage report --fail-under=70"
+                sh "coverage html"
+                publishHTML (target: [
+                    reportDir: 'htmlcov',
+                    reportFiles: 'index.html',
+                    reportName: "Coverage Report"
+                ])
+            }
+        }
+
+        stage("Static code analysis") {
+            steps {
+                sh "flake8 blackjack.py test_blackjack.py"
+            }
+        }
+
+    }
+    post {
+        success {
+            echo 'Pipeline completada con exito.'
+        }
+        failure {
+            echo 'La pipeline ha fallado. Revisa los errores.'
+        }
+    }
+}
