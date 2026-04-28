@@ -16,7 +16,7 @@ class Card:
             return 11  
         else:
             return int(self.rank)
-
+ 
     def __str__(self):
         return f"{self.rank} de {self.suit}"
 
